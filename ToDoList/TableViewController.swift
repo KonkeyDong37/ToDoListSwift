@@ -7,27 +7,40 @@
 //
 
 import UIKit
+import CoreData
 
 class TableViewController: UITableViewController {
     
-    var tasks: [String] = []
+    var tasks: [Tasks] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+    }
+    
+    @IBAction func deleteList(_ sender: UIBarButtonItem) {
+        let context = getContext()
+        let fetchRequest: NSFetchRequest<Tasks> = Tasks.fetchRequest()
+        
+        if let objects = try? context.fetch(fetchRequest) {
+            for object in objects {
+                context.delete(object)
+            }
+        }
+        
+        do {
+            try context.save()
+            tableView.reloadData()
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
     }
     
     @IBAction func addTask(_ sender: UIBarButtonItem) {
         let alertController = UIAlertController(title: "New Task", message: "Pleas add a new task", preferredStyle: .alert)
         let saveAction = UIAlertAction(title: "Save", style: .default) { action in
             let tf = alertController.textFields?.first
-            if let newTask = tf?.text {
-                self.tasks.insert(newTask, at: 0)
+            if let newTaskTitle = tf?.text {
+                self.saveTask(withTitle: newTaskTitle)
                 self.tableView.reloadData()
             }
         }
@@ -38,6 +51,41 @@ class TableViewController: UITableViewController {
         alertController.addAction(cancelAction)
         
         present(alertController, animated: true, completion: nil)
+    }
+    
+    private func getContext() -> NSManagedObjectContext {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        return appDelegate.persistentContainer.viewContext
+    }
+    
+    private func saveTask(withTitle title: String) {
+        let context = getContext()
+        guard let entity = NSEntityDescription.entity(forEntityName: "Tasks", in: context) else { return }
+        
+        let taskObject = Tasks(entity: entity, insertInto: context)
+        taskObject.title = title
+        
+        do {
+            try context.save()
+            tasks.append(taskObject)
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        let context = getContext()
+        let fetchRequest: NSFetchRequest<Tasks> = Tasks.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        do {
+            tasks = try context.fetch(fetchRequest)
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
     }
     
     // MARK: - Table view data source
@@ -54,8 +102,9 @@ class TableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-
-        cell.textLabel?.text = tasks[indexPath.row]
+        let task = tasks[indexPath.row]
+        
+        cell.textLabel?.text = task.title
 
         return cell
     }

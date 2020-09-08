@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="odd-JU-KRM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.3" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="odd-JU-KRM">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
@@ -30,6 +30,11 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="To-Do List" id="Nb5-uY-RyG">
+                        <barButtonItem key="leftBarButtonItem" title="Item" image="trash" catalog="system" id="cr3-NH-gPA">
+                            <connections>
+                                <action selector="deleteList:" destination="Q8L-3S-fPC" id="MUk-7F-HVS"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" style="done" systemItem="add" id="eAw-zt-ESl">
                             <connections>
                                 <action selector="addTask:" destination="Q8L-3S-fPC" id="6p2-h3-ems"/>
@@ -60,4 +65,7 @@
             <point key="canvasLocation" x="79.710144927536234" y="123.88392857142857"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="trash" catalog="system" width="121" height="128"/>
+    </resources>
 </document>
